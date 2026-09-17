@@ -4,6 +4,8 @@ Next.js 16 App Router + SQLite 기반 업무 자동화 도구 스캐폴딩 템�
 
 여기서 시작해서 원하는 내부 도구를 바이브코딩으로 만든다.
 
+**저장소**: https://github.com/donum2024-alt/practice
+
 ---
 
 ## 시작하기
