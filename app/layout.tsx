@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Sans_KR, JetBrains_Mono } from 'next/font/google';
 import { NavLink } from '@/components/ui/NavLink';
-import { Home, ClipboardList } from 'lucide-react';
+import { Home, Building2 } from 'lucide-react';
 import './globals.css';
 
 const sans = IBM_Plex_Sans_KR({
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 // 여기에 네비게이션 항목을 추가하세요.
 const navItems = [
   { href: '/', label: '홈', Icon: Home },
-  { href: '/applications', label: '심사 목록', Icon: ClipboardList },
+  { href: '/competitors', label: '경쟁사', Icon: Building2 },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

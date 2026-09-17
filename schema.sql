@@ -2,36 +2,28 @@
 -- 개발 단계에서는 스키마를 매 시작 재실행하는 것을 전제로 CREATE 문에 컬럼을 추가합니다.
 -- 기능별로 블록을 나눠 정의합니다.
 
--- ── applications (sincheong-jeopsu) ──────────────────────────────
--- 가맹점 신청 레코드. status가 전체 심사 흐름의 상태 정본.
-CREATE TABLE IF NOT EXISTS applications (
+-- ── competitors (gyeongjaengsa-josa) ─────────────────────────────
+-- 조사 대상 경쟁사 레코드. status가 전체 조사 흐름의 상태 정본.
+CREATE TABLE IF NOT EXISTS competitors (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  biz_name TEXT NOT NULL,
-  biz_reg_no TEXT NOT NULL,
-  representative TEXT NOT NULL,
-  industry TEXT NOT NULL,
-  business_type TEXT NOT NULL,
-  expected_sales TEXT NOT NULL,
-  agency TEXT,
-  status TEXT NOT NULL DEFAULT '접수',
+  name TEXT NOT NULL,
+  homepage TEXT,
+  note TEXT,
+  mentioned_by_exec INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT '조사중',
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
--- ── document_checks / document_requests (seoryu-hwagin) ──────────
--- 신청별 서류묶음 확인 체크리스트와 대리점 재요청 내역.
-CREATE TABLE IF NOT EXISTS document_checks (
+-- ── collected_materials (jaryo-suchip) ────────────────────────────
+-- 경쟁사별 수집 자료. AI 웹 검색 결과 또는 담당자가 직접 붙여넣은 내용.
+CREATE TABLE IF NOT EXISTS collected_materials (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  application_id INTEGER NOT NULL REFERENCES applications(id),
-  doc_type TEXT NOT NULL,
-  received INTEGER NOT NULL DEFAULT 0,
-  note TEXT,
+  competitor_id INTEGER NOT NULL REFERENCES competitors(id),
+  content TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  source_name TEXT,
+  source_url TEXT,
+  topic TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
-);
-
-CREATE TABLE IF NOT EXISTS document_requests (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  application_id INTEGER NOT NULL REFERENCES applications(id),
-  requested_docs TEXT NOT NULL,
-  requested_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );

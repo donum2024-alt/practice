@@ -1,16 +1,14 @@
 import { Badge } from '@/components/ui/Badge';
-import type { ApplicationStatus } from '@/types';
+import type { CompetitorStatus } from '@/types';
 
 const STATUS_COLOR = {
-  접수: 'gray',
-  서류보완: 'yellow',
-  심사중: 'blue',
-  팀장승인대기: 'yellow',
-  승인완료: 'green',
-  반려: 'red',
+  조사중: 'gray',
+  자료수집됨: 'blue',
+  정리완료: 'teal',
+  벤치마킹도출: 'green',
 } as const;
 
-export function StatusBadge({ status }: { status: ApplicationStatus }) {
+export function StatusBadge({ status }: { status: CompetitorStatus }) {
   return <Badge color={STATUS_COLOR[status]}>{status}</Badge>;
 }
 

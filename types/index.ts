@@ -1,107 +1,64 @@
 // 모든 타입은 이 파일에서 단일 관리합니다.
 
-// ── applications / 상태 모델 (sincheong-jeopsu) ──────────────────
-// 이 스펙이 전체 심사 흐름의 상태 전이 정본을 소유합니다.
+// ── competitors / 조사 상태 모델 (gyeongjaengsa-josa) ─────────────
+// 이 스펙이 경쟁사 레코드와 조사 상태 모델의 정본을 소유합니다.
 
-export type ApplicationStatus =
-  | '접수'
-  | '서류보완'
-  | '심사중'
-  | '팀장승인대기'
-  | '승인완료'
-  | '반려';
+export type CompetitorStatus = '조사중' | '자료수집됨' | '정리완료' | '벤치마킹도출';
 
-export type Application = {
+export type Competitor = {
   id: number;
-  biz_name: string;
-  biz_reg_no: string;
-  representative: string;
-  industry: string;
-  business_type: string;
-  expected_sales: string;
-  agency: string | null;
-  status: ApplicationStatus;
+  name: string;
+  homepage: string | null;
+  note: string | null;
+  mentioned_by_exec: boolean;
+  status: CompetitorStatus;
   created_at: string;
   updated_at: string;
 };
 
-export const APPLICATION_STATUSES: ApplicationStatus[] = [
-  '접수',
-  '서류보완',
-  '심사중',
-  '팀장승인대기',
-  '승인완료',
-  '반려',
+export const COMPETITOR_STATUSES: CompetitorStatus[] = [
+  '조사중',
+  '자료수집됨',
+  '정리완료',
+  '벤치마킹도출',
 ];
 
-export const APPLICATION_STATUS_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
-  접수: ['서류보완', '심사중'],
-  서류보완: ['심사중'],
-  심사중: ['서류보완', '팀장승인대기', '반려'],
-  팀장승인대기: ['승인완료', '반려', '심사중'],
-  승인완료: [],
-  반려: [],
-};
-
-export function isApplicationStatus(value: unknown): value is ApplicationStatus {
-  return typeof value === 'string' && (APPLICATION_STATUSES as string[]).includes(value);
+export function isCompetitorStatus(value: unknown): value is CompetitorStatus {
+  return typeof value === 'string' && (COMPETITOR_STATUSES as string[]).includes(value);
 }
 
-export function canTransition(from: ApplicationStatus, to: ApplicationStatus): boolean {
-  return APPLICATION_STATUS_TRANSITIONS[from].includes(to);
+// 자동 전이 전용 헬퍼: target이 current보다 더 앞선 단계일 때만 target으로 올리고,
+// 이미 더 앞서 있으면 current를 그대로 유지한다(뒤로 되돌리지 않는다).
+// 담당자가 직접 PATCH로 상태를 바꾸는 경우(뒤로 되돌리기 포함)에는 쓰지 않는다.
+export function advanceStatus(current: CompetitorStatus, target: CompetitorStatus): CompetitorStatus {
+  return COMPETITOR_STATUSES.indexOf(target) > COMPETITOR_STATUSES.indexOf(current) ? target : current;
 }
 
-export function nextActionLabel(status: ApplicationStatus): string {
-  switch (status) {
-    case '접수':
-      return '서류묶음 확인 필요';
-    case '서류보완':
-      return '대리점 서류 회신 대기';
-    case '심사중':
-      return '심사보고서 작성';
-    case '팀장승인대기':
-      return '팀장 승인 대기';
-    case '승인완료':
-    case '반려':
-      return '심사 종료';
-  }
+// ── collected_materials / 수집 자료 (jaryo-suchip) ─────────────────
+
+export type MaterialSource = '웹검색' | '직접입력' | '지인회의';
+
+export const MATERIAL_SOURCES: MaterialSource[] = ['웹검색', '직접입력', '지인회의'];
+
+export function isMaterialSource(value: unknown): value is MaterialSource {
+  return typeof value === 'string' && (MATERIAL_SOURCES as string[]).includes(value);
 }
 
-// ── 서류묶음 확인 (seoryu-hwagin) ──────────────────────────────
+export type MaterialTopic = 'SKU수' | '물류운영' | '가격책정' | '강점' | '차별화요소' | '기타';
 
-// doc_type은 자유 문자열이라 표준 3항목 외 추가 항목을 허용한다.
-export type DocType = string;
+export const MATERIAL_TOPICS: MaterialTopic[] = ['SKU수', '물류운영', '가격책정', '강점', '차별화요소', '기타'];
 
-export const STANDARD_DOC_TYPES = [
-  '사업자등록증',
-  '통장사본',
-  '등기부등본/임대차계약서',
-] as const;
+export function isMaterialTopic(value: unknown): value is MaterialTopic {
+  return typeof value === 'string' && (MATERIAL_TOPICS as string[]).includes(value);
+}
 
-export type DocumentCheck = {
+export type CollectedMaterial = {
   id: number;
-  application_id: number;
-  doc_type: DocType;
-  received: boolean;
-  note: string | null;
+  competitor_id: number;
+  content: string;
+  source_type: MaterialSource;
+  source_name: string | null;
+  source_url: string | null;
+  topic: MaterialTopic | null;
   created_at: string;
 };
-
-export type DocumentRequest = {
-  id: number;
-  application_id: number;
-  requested_docs: string;
-  requested_at: string;
-};
-
-// 재요청 기록 시 자동으로 '서류보완'으로 전이시킬 대상 상태.
-export const DOC_REQUEST_AUTO_SUPPLEMENT_FROM: ApplicationStatus[] = ['접수', '심사중'];
-
-export function missingDocuments(checks: DocumentCheck[]): DocType[] {
-  return checks.filter((c) => !c.received).map((c) => c.doc_type);
-}
-
-// '심사 시작' 가드: 항목이 하나 이상 있고 전부 받음이어야 통과.
-export function canStartReview(checks: DocumentCheck[]): boolean {
-  return checks.length > 0 && checks.every((c) => c.received);
-}
