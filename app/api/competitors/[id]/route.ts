@@ -116,11 +116,32 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     total += count;
   }
 
+  // strategy_steps는 competitors의 직접 자식이 아니라 benchmark_points를 거친 손자
+  // 테이블이므로 CHILD_TABLES 이름 목록 방식으로 걸러지지 않아 별도로 집계한다.
+  const strategyStepsCount = existingTables.has('strategy_steps')
+    ? (
+        db
+          .prepare(
+            `SELECT COUNT(*) AS c FROM strategy_steps
+             WHERE benchmark_point_id IN (SELECT id FROM benchmark_points WHERE competitor_id = ?)`,
+          )
+          .get(competitor.id) as { c: number }
+      ).c
+    : 0;
+  counts.strategy_steps = strategyStepsCount;
+  total += strategyStepsCount;
+
   if (total > 0 && !force) {
     return Response.json({ error: '연결된 자료가 있습니다.', counts, total }, { status: 409 });
   }
 
   const cascade = db.transaction((competitorId: number) => {
+    if (existingTables.has('strategy_steps')) {
+      db.prepare(
+        `DELETE FROM strategy_steps
+         WHERE benchmark_point_id IN (SELECT id FROM benchmark_points WHERE competitor_id = ?)`,
+      ).run(competitorId);
+    }
     for (const table of CHILD_TABLES) {
       if (existingTables.has(table)) {
         db.prepare(`DELETE FROM ${table} WHERE competitor_id = ?`).run(competitorId);

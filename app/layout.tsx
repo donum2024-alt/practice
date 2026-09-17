@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Sans_KR, JetBrains_Mono } from 'next/font/google';
 import { NavLink } from '@/components/ui/NavLink';
-import { Home, Building2 } from 'lucide-react';
+import { Home, Building2, Columns3, Target } from 'lucide-react';
 import './globals.css';
 
 const sans = IBM_Plex_Sans_KR({
@@ -25,6 +25,8 @@ export const metadata: Metadata = {
 const navItems = [
   { href: '/', label: '홈', Icon: Home },
   { href: '/competitors', label: '경쟁사', Icon: Building2 },
+  { href: '/compare', label: '비교', Icon: Columns3 },
+  { href: '/benchmarks', label: '벤치마킹', Icon: Target },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

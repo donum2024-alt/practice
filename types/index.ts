@@ -62,3 +62,62 @@ export type CollectedMaterial = {
   topic: MaterialTopic | null;
   created_at: string;
 };
+
+// ── summaries / 항목별 정리 (hangmokbyeol-jeongni) ─────────────────
+
+export type SummaryItemKey = 'SKU수' | '물류운영' | '가격책정' | '강점' | '차별화요소';
+
+export const SUMMARY_ITEM_KEYS: SummaryItemKey[] = ['SKU수', '물류운영', '가격책정', '강점', '차별화요소'];
+
+export type Summary = {
+  id: number;
+  competitor_id: number;
+  sku_count: string | null;
+  logistics: string | null;
+  pricing: string | null;
+  strengths: string | null;
+  differentiation: string | null;
+  confirmed: boolean;
+  confirmed_at: string | null;
+  updated_at: string | null;
+};
+
+// ── benchmark_points / 벤치마킹 지점 (benchmarking-jijeom) ──────────
+
+export type BenchmarkReflectionStatus = '검토중' | '전략수립됨' | '사업반영됨' | '보류';
+
+export const BENCHMARK_REFLECTION_STATUSES: BenchmarkReflectionStatus[] = [
+  '검토중',
+  '전략수립됨',
+  '사업반영됨',
+  '보류',
+];
+
+export function isBenchmarkReflectionStatus(value: unknown): value is BenchmarkReflectionStatus {
+  return typeof value === 'string' && (BENCHMARK_REFLECTION_STATUSES as string[]).includes(value);
+}
+
+export type BenchmarkPoint = {
+  id: number;
+  competitor_id: number;
+  source_item: SummaryItemKey;
+  description: string;
+  rationale: string | null;
+  reflection_status: BenchmarkReflectionStatus;
+  result_note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BenchmarkPointWithCompetitor = BenchmarkPoint & { competitor_name: string };
+
+// ── strategy_steps / 단계별 실행 전략 (siljeon-jeonryak) ────────────
+
+export type StrategyStep = {
+  id: number;
+  benchmark_point_id: number;
+  step_order: number;
+  description: string;
+  created_at: string;
+  updated_at: string;
+};

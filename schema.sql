@@ -27,3 +27,43 @@ CREATE TABLE IF NOT EXISTS collected_materials (
   topic TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
+
+-- ── summaries (hangmokbyeol-jeongni) ──────────────────────────────
+-- 경쟁사당 1행. 5개 항목(SKU 수·물류 운영 방식·가격 책정 방식·강점·차별화 요소) 정리 문서.
+CREATE TABLE IF NOT EXISTS summaries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  competitor_id INTEGER NOT NULL UNIQUE REFERENCES competitors(id),
+  sku_count TEXT,
+  logistics TEXT,
+  pricing TEXT,
+  strengths TEXT,
+  differentiation TEXT,
+  confirmed INTEGER NOT NULL DEFAULT 0,
+  confirmed_at TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
+-- ── benchmark_points (benchmarking-jijeom) ────────────────────────
+-- 정리·비교 내용에서 뽑아낸 벤치마킹 지점. 실제 사업 반영 상태와 결과 메모를 담당자가 직접 관리한다.
+CREATE TABLE IF NOT EXISTS benchmark_points (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  competitor_id INTEGER NOT NULL REFERENCES competitors(id),
+  source_item TEXT NOT NULL,
+  description TEXT NOT NULL,
+  rationale TEXT,
+  reflection_status TEXT NOT NULL DEFAULT '검토중',
+  result_note TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
+-- ── strategy_steps (siljeon-jeonryak) ─────────────────────────────
+-- 벤치마킹 지점당 여러 행. step_order는 1부터 시작하는 연속된 순번.
+CREATE TABLE IF NOT EXISTS strategy_steps (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  benchmark_point_id INTEGER NOT NULL REFERENCES benchmark_points(id),
+  step_order INTEGER NOT NULL,
+  description TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);

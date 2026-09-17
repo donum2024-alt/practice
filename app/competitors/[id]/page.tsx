@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/Badge';
 import { StatusBadge } from '@/components/StatusBadge';
 import { COMPETITOR_STATUSES, type Competitor, type CompetitorStatus } from '@/types';
 import { MaterialsSection } from './MaterialsSection';
+import { ItemSummarySection } from './ItemSummarySection';
+import { BenchmarkPointsSection } from './BenchmarkPointsSection';
 
 type EditForm = {
   name: string;
@@ -240,20 +242,18 @@ export default function CompetitorDetailPage() {
           )}
         </Card>
 
-        <Card title="수집 자료">
-          <MaterialsSection competitorId={competitor.id} onMaterialsChanged={load} />
-        </Card>
+        <div id="materials-section">
+          <Card title="수집 자료">
+            <MaterialsSection competitorId={competitor.id} onMaterialsChanged={load} />
+          </Card>
+        </div>
 
         <Card title="항목별 정리">
-          <p className="text-sm text-[#999]">항목별 정리 문서는 다음 단계에서 추가됩니다.</p>
+          <ItemSummarySection competitorId={competitor.id} />
         </Card>
 
         <Card title="벤치마킹 지점">
-          <p className="text-sm text-[#999]">벤치마킹 지점 영역은 다음 단계에서 추가됩니다.</p>
-        </Card>
-
-        <Card title="실행 전략">
-          <p className="text-sm text-[#999]">실행 전략 영역은 다음 단계에서 추가됩니다.</p>
+          <BenchmarkPointsSection competitorId={competitor.id} onPointsChanged={load} />
         </Card>
       </div>
     </div>
