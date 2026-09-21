@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
@@ -52,9 +52,11 @@ export default function ComparePage() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [entries, setEntries] = useState<CompareEntry[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
+  const [urlSynced, setUrlSynced] = useState(false);
 
   useEffect(() => {
     setSelectedIds(parseIds(new URLSearchParams(window.location.search).get('ids')));
+    setUrlSynced(true);
   }, []);
 
   useEffect(() => {
@@ -74,28 +76,18 @@ export default function ComparePage() {
     });
   }, [competitors]);
 
-  const syncUrl = useCallback(
-    (ids: number[]) => {
-      const query = ids.length > 0 ? `?ids=${ids.join(',')}` : '';
-      router.replace(`/compare${query}`, { scroll: false });
-    },
-    [router],
-  );
+  useEffect(() => {
+    if (!urlSynced) return;
+    const query = selectedIds.length > 0 ? `?ids=${selectedIds.join(',')}` : '';
+    router.replace(`/compare${query}`, { scroll: false });
+  }, [selectedIds, urlSynced, router]);
 
   function toggle(id: number) {
-    setSelectedIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id];
-      syncUrl(next);
-      return next;
-    });
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   }
 
   function remove(id: number) {
-    setSelectedIds((prev) => {
-      const next = prev.filter((v) => v !== id);
-      syncUrl(next);
-      return next;
-    });
+    setSelectedIds((prev) => prev.filter((v) => v !== id));
   }
 
   useEffect(() => {
