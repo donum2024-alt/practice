@@ -14,3 +14,8 @@ export function getDB(): Database.Database {
   db.exec(schema);
   return db;
 }
+
+export function closeDB(): void {
+  db?.close();
+  db = null;
+}

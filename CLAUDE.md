@@ -94,3 +94,16 @@ import { Card } from '@/components/ui/Card';
 
 `sample` 브랜치 — PG 가맹점 위험도 분석 AI 에이전트 시스템 구현체.
 이 템플릿에서 출발해 동일한 아키텍처로 만든 실제 작동하는 앱.
+
+## Testing
+
+- Framework: Vitest
+- 전체 실행: `npm test` / 단일 파일: `npx vitest run tests/<file>.test.ts`
+- 테스트 위치: `tests/<spec-name>.test.ts` (spec 하나당 파일 하나)
+
+## 워크플로
+
+`grilling` → `to-spec` → `implement` → `spec-retire`
+
+구현이 끝나면 `spec-retire`로 spec을 테스트·ADR로 이관하고 제거한다.
+현행 명세는 `tests/`, 결정 근거는 `docs/adr/`다.

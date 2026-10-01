@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 Implement the work described by the spec(s) the user is pointing at.
 
+## Methodology
+
+Always implement using test-driven development: invoke the `tdd` skill before writing any implementation code, and follow its red → green loop for every slice of work.
+
 ## 1. Determine the scope
 
 Work out which specs this run covers:
